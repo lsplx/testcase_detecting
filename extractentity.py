@@ -71,7 +71,7 @@ def jaccard_similarity(s1, s2):
     # 计算杰卡德系数
     return 1.0 * numerator / denominator
 
-data_path ='D:/czy/OneDrive/UCAS/VQA/测试推荐/公共数据集构建/data/word2vec.vector'
+data_path ='D:/data/word2vec.vector'
 with open(data_path, 'r', encoding='UTF-8') as inp_vec:
     emb_vec = inp_vec.readlines()
     word_vectors = {}
@@ -94,7 +94,7 @@ def vector_similarity(s1, s2):
         v1, v2 = sentence_vector(s1), sentence_vector(s2)
         return np.dot(v1, v2) / (norm(v1) * norm(v2))
 testnumlist = [[4,10],[10,18],[26,32],[261,269],[326,334],[401,409],[591,598],[807,813],[868,876],[1000,1006]]
-object_path = "D:/czy/OneDrive/UCAS/VQA/测试推荐/公共数据集构建/data/project_splitdata/project5_new.xlsx"
+object_path = "D:/data/project_splitdata/project5_new.xlsx"
 try:
     pd_sheets = pd.ExcelFile(object_path)
 except Exception as e:
@@ -128,10 +128,6 @@ for row in df.itertuples(index=True):
         test_expectedresult = [""]
     if pd.isnull(preconobject):
         preconobject = [""]
-    #只考虑一个测试项
-    # testcase_name.append(testcasename[0])
-    # testcase_des.append(testdes[0] )
-    # test_relation.append(testrelation[0])
     if testname == testitem[0].strip() and testname != "命令":
         testcase_name.append(testcasename[0])
         testcase_des.append(testdes[0] )
@@ -162,7 +158,7 @@ unredundancy_TP = 0
 unredundancy_FP = 0
 unredundancy_FN = 0
 kongnum = 0
-log_path = "D:/czy/OneDrive/UCAS/VQA/测试推荐/公共数据集构建/data/result/project10.txt"
+log_path = "D:/data/result/project10.txt"
 sameitemnum = 0
 nosameitemnum= 0
 
@@ -612,12 +608,7 @@ for k,datalist in enumerate(testcasedes_list):
                                 redundancy_list[indextwo] = 1
         print(redundancy_list)
 
-    
-        # # list转dataframe
-        # df = pd.DataFrame(redundancy_list, columns=['relation'])
-        
-        # # 保存到本地excel
-        # df.to_excel("D:/czy/OneDrive/UCAS/VQA/测试推荐/公共数据集构建/data/project_splitdata/project8_redundanctextract.xlsx", index=False)
+   
 
         #计算指标
         for num,each in enumerate(testrelation_list[k]):
@@ -632,10 +623,7 @@ for k,datalist in enumerate(testcasedes_list):
                 unredundancy_FP += 1
                 redundancy_FN += 1
 
-            
-                            
-            #这里就不把这个值加入列表中
-            # nmiscore = 0
+           
 
 
         #日志
