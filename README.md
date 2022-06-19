@@ -11,7 +11,7 @@ tqdm==4.55.1
 transformers[sentencepiece]==4.1.1
 scikit-learn==0.24.0
 spacy==2.2.4
-flask==1.1.2 
+flask==1.1.2
 flask-cors==3.0.10
 gevent==21.1.2
 pillow==8.2.0
