@@ -3,7 +3,7 @@ import math
 import os
 from typing import Type
 import os,sys
-sys.path.append('./spert_master_new/')
+sys.path.append('./model/')
 import torch
 from torch.nn import DataParallel
 from torch.optim import Optimizer
@@ -12,15 +12,15 @@ from torch.utils.data import DataLoader
 from transformers import AdamW, BertConfig, XLNetConfig, AlbertConfig
 from transformers import BertTokenizer,XLNetTokenizer, AlbertTokenizer
 # -*- coding:utf-8 -*-
-from spert import models, prediction
-from spert import sampling
-from spert import sampling
-from spert import util
-from spert.entities import Dataset
-from spert.evaluator import Evaluator
-from spert.input_reader import  BaseInputReader, JsonPredictionInputReader, JsonPredictionInputReaderen
-from spert.loss import SpERTLoss, Loss
-from spert.trainer import BaseTrainer
+from model import models, prediction
+from model import sampling
+from model import sampling
+from model import util
+from model.entities import Dataset
+from model.evaluator import Evaluator
+from model.input_reader import  BaseInputReader, JsonPredictionInputReader, JsonPredictionInputReaderen
+from model.loss import SpERTLoss, Loss
+from model.trainer import BaseTrainer
 from tqdm import tqdm
 
 import re
@@ -28,21 +28,21 @@ import re
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 
-class SpERTTrainer(BaseTrainer):
+class modelTrainer(BaseTrainer):
     """ Joint entity and relation extraction training and evaluation """
 
     def __init__(self):
         
         
-        self._tokenizer = BertTokenizer.from_pretrained("./spert_master_new/scripts/data/models/tc2000model",
+        self._tokenizer = BertTokenizer.from_pretrained("./model/scripts/data/models/tc2000model",
                                                         do_lower_case=False,
                                                         cache_dir=None)
-        self._tokenizer_en = BertTokenizer.from_pretrained("./spert_master_new/scripts/data/models/enmodel",
+        self._tokenizer_en = BertTokenizer.from_pretrained("./model/scripts/data/models/enmodel",
                                                         do_lower_case=False,
                                                         cache_dir=None)
         self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.prediction = []
-        self.types_path = "./spert_master_new/scripts/data/datasets/type/testcaseplusre_type.json"
+        self.types_path = "./model/scripts/data/datasets/type/testcaseplusre_type.json"
         self.max_span_size = 15
         self.spacy_model = "en_core_web_sm"
         self.input_reader = JsonPredictionInputReader
@@ -72,7 +72,7 @@ class SpERTTrainer(BaseTrainer):
     
 
     def _load_model(self, input_reader):
-        model_class = models.get_model("spert")
+        model_class = models.get_model("model")
         model_path = "./model/scripts/data/models/tc2000model"
         max_pairs = 1000
         prop_drop = 0.1
@@ -83,10 +83,10 @@ class SpERTTrainer(BaseTrainer):
         config = BertConfig.from_pretrained(model_path)
         util.check_version(config, model_class, model_path)
 
-        config.spert_version = model_class.VERSION
+        config.model_version = model_class.VERSION
         model = model_class.from_pretrained(model_path,
                                             config=config,
-                                            # SpERT model parameters
+                                            # model model parameters
                                             cls_token=self._tokenizer.convert_tokens_to_ids('[CLS]'),
                                             relation_types=input_reader.relation_type_count - 1,
                                             entity_types=input_reader.entity_type_count,

@@ -24,12 +24,6 @@ def EntityRelationEx():
 	text_list = []
 	text_list.append(text)
 	summary = model.predict(text_list)
-	print("summary:")
-	print(summary)
-	logging.info("192.168.15.167")
-	logging.info("NER")
-	logging.info(text)
-	logging.info(summary)
 	return json.dumps(summary)
 
 

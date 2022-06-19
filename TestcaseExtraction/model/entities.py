@@ -2,7 +2,7 @@ from collections import OrderedDict
 from typing import List
 from torch.utils.data import Dataset as TorchDataset
 import os,sys
-sys.path.append('./spert_master_new/')
+sys.path.append('./model/')
 from spert import sampling
 # import sampling
 

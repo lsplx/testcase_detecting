@@ -4,7 +4,7 @@ import os
 import random
 import shutil
 import sys
-sys.path.append('./spert_master_new/')
+sys.path.append('./model/')
 import numpy as np
 import torch
 

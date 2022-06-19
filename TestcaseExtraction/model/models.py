@@ -4,8 +4,8 @@ from transformers import BertConfig,XLNetConfig,AlbertConfig
 from transformers import BertModel,XLNetModel,AlbertModel
 from transformers import BertPreTrainedModel,XLNetPreTrainedModel,AlbertPreTrainedModel
 
-from spert import sampling
-from spert import util
+from model import sampling
+from model import util
 
 # import sampling
 # import util

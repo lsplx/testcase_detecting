@@ -11,8 +11,8 @@ from torch.optim import Optimizer
 from transformers import PreTrainedModel
 from transformers import PreTrainedTokenizer
 
-from spert import util
-from spert.opt import tensorboardX
+from model import util
+from model.opt import tensorboardX
 # import util
 # from opt import tensorboardX
 

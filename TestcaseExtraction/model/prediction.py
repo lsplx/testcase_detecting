@@ -3,8 +3,8 @@ from typing import Tuple
 
 import torch
 
-from spert import util
-from spert.input_reader import BaseInputReader
+from model import util
+from model.input_reader import BaseInputReader
 # import util
 # from input_reader import BaseInputReader
 
