@@ -4,6 +4,8 @@ TestcaseExtraction is used for extracting entities and relations.
 
 Usage:
 
+python app.py
+
 python extractentity.py
 
 Packages:
