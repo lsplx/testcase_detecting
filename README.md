@@ -1,10 +1,12 @@
 Extractentity.py is used for redundancy detection.
+TestcaseExtraction is used for extracting entities and relations.
 
 Usage:
 python extractentity.py
 
 Packages:
-Jinja2==2.11.3
+python == 3.6.0
+Jinja2 == 2.11.3
 numpy==1.17.4
 tensorboardX==1.6
 tqdm==4.55.1
