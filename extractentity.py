@@ -58,20 +58,15 @@ def jaccard_similarity(s1, s2):
     def add_space(s):
         return ' '.join(list(s))
     
-    # 将字中间加入空格
     s1, s2 = add_space(s1), add_space(s2)
-    # 转化为TF矩阵
     cv = CountVectorizer(tokenizer=lambda s: s.split())
     corpus = [s1, s2]
     vectors = cv.fit_transform(corpus).toarray()
-    # 求交集
     numerator = np.sum(np.min(vectors, axis=0))
-    # 求并集
     denominator = np.sum(np.max(vectors, axis=0))
-    # 计算杰卡德系数
     return 1.0 * numerator / denominator
 
-data_path ='D:/data/word2vec.vector'
+data_path ='./data/word2vec.vector'
 with open(data_path, 'r', encoding='UTF-8') as inp_vec:
     emb_vec = inp_vec.readlines()
     word_vectors = {}
@@ -79,7 +74,7 @@ with open(data_path, 'r', encoding='UTF-8') as inp_vec:
         result = vec.strip().split(' ',1)
         word_vectors[result[0]] = np.array(list((map(float, result[1].split()))))
 
-url = "http://192.168.15.183:8000//api/EntityRelationEx/"
+url = "http://127.0.0.0:8000//api/EntityRelationEx/"
 datalist = []
 
 def vector_similarity(s1, s2):
@@ -94,11 +89,11 @@ def vector_similarity(s1, s2):
         v1, v2 = sentence_vector(s1), sentence_vector(s2)
         return np.dot(v1, v2) / (norm(v1) * norm(v2))
 testnumlist = [[4,10],[10,18],[26,32],[261,269],[326,334],[401,409],[591,598],[807,813],[868,876],[1000,1006]]
-object_path = "D:/data/project_splitdata/project5_new.xlsx"
+object_path = "./data/project.xlsx"
 try:
     pd_sheets = pd.ExcelFile(object_path)
 except Exception as e:
-    print("读取 {} 文件失败".format(object_path), e)
+    print("fail".format(object_path), e)
 
 df = pd.read_excel(pd_sheets, "Sheet1", header=[0])
 temp = "最小内存余量测试"
@@ -112,13 +107,9 @@ testrelation_list = []
 for row in df.itertuples(index=True):
     row_list = list(row)
     testcasename = row_list[5:6]
-    #测试说明
     testdes = row_list[7:8]
-    #预置条件对象
     preconobject = row_list[8:9]
-    #输入操作
     test_input = row_list[9:10]
-    #期望测试结果
     test_expectedresult = row_list[10:11]
     testrelation = row_list[4:5]
     testitem = row_list[3:4]
@@ -158,7 +149,7 @@ unredundancy_TP = 0
 unredundancy_FP = 0
 unredundancy_FN = 0
 kongnum = 0
-log_path = "D:/data/result/project10.txt"
+log_path = "./data/result/project10.txt"
 sameitemnum = 0
 nosameitemnum= 0
 
@@ -201,26 +192,22 @@ for k,datalist in enumerate(testcasedes_list):
         judgeprecon = True
         obj_flag = 0
         for entity in result["entities"]:
-            if entity["type"] == "测试对象":
+            if entity["type"] == "Component":
                 obj_flag += 1
-        #两个以上的对象做查找关系操作才有意义
         if obj_flag >= 2:
             for entity in result["entities"]:
-                if entity["type"] == "测试对象":
+                if entity["type"] == "Component":
                     obj_id = entity["id"]
                     obj_value = entity["value"].replace(" ","")
                     testcasetemp_dic = {}
-                    testcasetemp_dic["测试对象"] = obj_value
-                    #考虑多元组全是对象，没有关系的情况
+                    testcasetemp_dic["Component"] = obj_value
                     if result["relations"] != []:
                         for relation in result["relations"]:
                             if relation["head"].strip() != "" and relation["tail"].strip() != "":
                                 if relation["tailIndex"] == obj_id:
                                     headIndex = relation["headIndex"]
-                                    #找与对象相连的另一个实体
                                     for each in result["entities"]:
                                         if each["id"] == headIndex:
-                                            #考虑一个对象有多种状态等情况
                                             if each["type"] in testcasetemp_dic:
                                                 testcasetemp_dic[each["type"]] += "," + each["value"].replace(" ","") 
                                             else:
@@ -230,33 +217,26 @@ for k,datalist in enumerate(testcasedes_list):
             testcasetemp_dic = {}
             if result["entities"] != [] :
                 for entity in result["entities"]:
-                    if entity["type"] != "预置条件对象":
-                        if entity["type"] in testcasetemp_dic:
-                            testcasetemp_dic[entity["type"]] += "," + entity["value"].replace(" ","") 
-                        else:
-                            testcasetemp_dic[entity["type"]] = entity["value"].replace(" ","")
-                    else:
-                        testcasetemp_dic["测试对象"] = result["sentence"]
+                    testcasetemp_dic["Component"] = result["sentence"]
             else:
                 if "是否支持" in result["sentence"]:
                     objentity = result["sentence"][result["sentence"].find("是否支持") + 4:len(result["sentence"])] 
-                    testcasetemp_dic["测试对象"] = objentity
+                    testcasetemp_dic["Component"] = objentity
                 elif  "是否可以" in result["sentence"]:
                     objentity = result["sentence"][result["sentence"].find("是否可以") + 4:len(result["sentence"])] 
-                    testcasetemp_dic["测试对象"] = objentity
+                    testcasetemp_dic["Component"] = objentity
                 elif "支持" in result["sentence"]:
                     objentity = result["sentence"][result["sentence"].find("支持") + 2:len(result["sentence"])] 
-                    testcasetemp_dic["测试对象"] = objentity
+                    testcasetemp_dic["Component"] = objentity
                 elif "可以" in result["sentence"]:
                     objentity = result["sentence"][result["sentence"].find("可以") + 2:len(result["sentence"])] 
-                    testcasetemp_dic["测试对象"] = objentity
+                    testcasetemp_dic["Component"] = objentity
                 else:
-                    testcasetemp_dic["测试对象"] = result["sentence"]
+                    testcasetemp_dic["Component"] = result["sentence"]
             final_list.append(testcasetemp_dic)
         entitylist.append(final_list)
 
     
-    #只取测试对象查看
     watch_list = []
     obj_list = []
     operate_list = []
@@ -264,53 +244,47 @@ for k,datalist in enumerate(testcasedes_list):
     tool_list = []
     condition_list = []
     tuple_list = []
-    #初始化元组的全集
     alltuple_list = []
     num_id = 0
     for entity in entitylist:
         templist = []
-        #这里就算上了一个测试用例多个对象的情况
         for entity_dic in entity:
-            #删除特性
-            if "软件特性" in entity_dic:
-                del entity_dic["软件特性"]
-            alltuple_list.append(entity_dic)
-            if "测试对象" in entity_dic:
+            if "Component" in entity_dic:
                 # tempdic = {}
-                # tempdic["测试对象"] = entity_dic["测试对象"]
+                # tempdic["Component"] = entity_dic["Component"]
                 # tempdic["id"] = num_id
                 # watch_list.append(tempdic)
                 tuple_list.append(num_id)
-                obj_list.append(entity_dic["测试对象"].lower())
+                obj_list.append(entity_dic["Component"].lower())
             else:
                 tuple_list.append(num_id)
                 obj_list.append(" ")
-            if "测试操作" in entity_dic:
+            if "Behavior" in entity_dic:
                 tempdic = {}
-                tempdic["测试操作"] = entity_dic["测试操作"]
+                tempdic["Behavior"] = entity_dic["Behavior"]
                 tempdic["id"] = num_id
-                operate_list.append(entity_dic["测试操作"].lower())
+                operate_list.append(entity_dic["Behavior"].lower())
             else:
                 operate_list.append(" ")
-            if "测试状态" in entity_dic:
+            if "Prerequisite " in entity_dic:
                 tempdic = {}
-                tempdic["测试状态"] = entity_dic["测试状态"]
+                tempdic["Prerequisite "] = entity_dic["Prerequisite "]
                 tempdic["id"] = num_id
-                state_list.append(entity_dic["测试状态"].lower())
+                state_list.append(entity_dic["Prerequisite "].lower())
             else:
                 state_list.append(" ")
-            if "测试工具" in entity_dic:
+            if "Manner " in entity_dic:
                 tempdic = {}
-                tempdic["测试工具"] = entity_dic["测试工具"]
+                tempdic["Manner "] = entity_dic["Manner "]
                 tempdic["id"] = num_id
-                tool_list.append(entity_dic["测试工具"].lower())
+                tool_list.append(entity_dic["Manner "].lower())
             else:
                 tool_list.append(" ")
-            if "满足条件" in entity_dic:
+            if "Constraint" in entity_dic:
                 tempdic = {}
-                tempdic["满足条件"] = entity_dic["满足条件"]
+                tempdic["Constraint"] = entity_dic["Constraint"]
                 tempdic["id"] = num_id
-                condition_list.append(entity_dic["满足条件"].lower())
+                condition_list.append(entity_dic["Constraint"].lower())
             else:
                 condition_list.append(" ")
         num_id += 1
@@ -326,7 +300,6 @@ for k,datalist in enumerate(testcasedes_list):
         unigram = {}
         for item in word_count.items():
             unigram[item[0]] = item[1] / total_count
-        #对象初始化，用SIF
         all_vector_representation = np.zeros(shape=(len(obj_list), 48))
         for i, line in enumerate(obj_list):
             word_sentence = jieba.cut(line)
@@ -355,8 +328,6 @@ for k,datalist in enumerate(testcasedes_list):
 
         XXobj = all_vector_representation - all_vector_representation.dot(pca.transpose()) * pca
 
-        
-         #操作初始化,不用SIF方法
         all_vector_representation = np.zeros(shape=(len(operate_list), 48))
         for i, line in enumerate(operate_list):
             word_sentence = jieba.cut(line)
@@ -379,7 +350,6 @@ for k,datalist in enumerate(testcasedes_list):
         XXoperate = all_vector_representation
 
         
-        #状态初始化,不用SIF方法
         all_vector_representation = np.zeros(shape=(len(state_list), 48))
         for i, line in enumerate(state_list):
             word_sentence = jieba.cut(line)
@@ -393,13 +363,11 @@ for k,datalist in enumerate(testcasedes_list):
                     continue
                 
                 sent_rep += wv 
-                # sent_rep += wv
             if j != 0:
                 all_vector_representation[i] = sent_rep / j
             else:
                 all_vector_representation[i] = sent_rep
         XXstate = all_vector_representation
-        #工具初始化,不用SIF方法
         all_vector_representation = np.zeros(shape=(len(tool_list), 48))
         for i, line in enumerate(tool_list):
             word_sentence = jieba.cut(line)
@@ -418,13 +386,8 @@ for k,datalist in enumerate(testcasedes_list):
                 all_vector_representation[i] = sent_rep / j
             else:
                 all_vector_representation[i] = sent_rep
-        #归一到[0,1]
-
         XXtool = all_vector_representation
 
-
-
-        #条件初始化,不用SIF方法
         all_vector_representation = np.zeros(shape=(len(condition_list), 48))
         for i, line in enumerate(condition_list):
             word_sentence = jieba.cut(line)
@@ -443,11 +406,9 @@ for k,datalist in enumerate(testcasedes_list):
                 all_vector_representation[i] = sent_rep / j
             else:
                 all_vector_representation[i] = sent_rep
-        #归一到[0,1]
         XXcondition = all_vector_representation
         score_num = 0
         XXzero = np.zeros(shape=(len(obj_list), 48))
-        #初始化赋值
         totalsum_list = cosine_similarity(XXzero)
         objcos_simlist = cosine_similarity(XXobj)
         objcos_simlist_oral = cosine_similarity(XXobj)
@@ -503,13 +464,10 @@ for k,datalist in enumerate(testcasedes_list):
 
                 if alltuple_list[numone].keys() == alltuple_list[numtwo].keys():
                     sameitemnum += 1
-                    #对操作小于3的单独处理
                     if (len(operate_list[numone]) <= 3 and len(operate_list[numtwo]) <= 3) and (operate_list[numone] != operate_list[numtwo]):
                         continue
-                    #抽取只有操作
                     elif operate_list[numtwo] != operate_list[numone]  and len(alltuple_list[numone]) == 1:
                         continue
-                    #考虑对象出现英文的情况
                     elif bool(re.search('[a-zA-Z]', obj_list[numtwo])) or bool(re.search('[a-zA-Z]', obj_list[numone])):
                         if re.sub('[\u4e00-\u9fa5]', '', obj_list[numone]) != re.sub('[\u4e00-\u9fa5]', '', obj_list[numtwo]):
                             continue
@@ -527,13 +485,11 @@ for k,datalist in enumerate(testcasedes_list):
                             for index,each in enumerate(clusterlist):
                                 if each == temp:
                                     clusterlist[index] = clusterlist[numtwo]
-                    #比较方法用w2v+sif+cos
                     elif objcos_simlist_oral[numone][numtwo] < 0.999 and objcos_simlist_oral[numone][numtwo] !=0:
                         continue
                     else:
                         if condition_list[numtwo] != condition_list[numone]:
                             continue
-                        #考虑工具出现英文的情况
                         if bool(re.search('[a-zA-Z]', tool_list[numtwo])) or bool(re.search('[a-zA-Z]', tool_list[numone])):
                             if re.sub("[\u4e00-\u9fa5\0-9\,\。]", "", tool_list[numtwo]) != re.sub("[\u4e00-\u9fa5\0-9\,\。]", "", tool_list[numone]):
                                 continue
@@ -548,33 +504,25 @@ for k,datalist in enumerate(testcasedes_list):
                                     clusterlist[index] = clusterlist[numtwo]
                 else:
                     nosameitemnum += 1
-        #初始化冗余列表
         redundancy_list = []
         for each in testrelation_list[k]:
             redundancy_list.append(0)
         if len(testrelation_list[k]) == len(clusterlist):
-            #做标注转换
             for numone,clusternumone in enumerate(clusterlist):
                 if redundancy_list[numone] == 0:
                     for numtwo in range(numone+1,len(clusterlist)):
-                        #如果后面有和前面标签一致的
                         if clusternumone == clusterlist[numtwo]:
                             redundancy_list[numtwo] = 1
-            # nmiscore = NMI(testrelation_list[k], clusterlist)
-            # nmiscorelist.append(nmiscore)
         else:
             new_clusterlist = []
             flag_num = 0
-            #将多元组转换为list
             for num,t in enumerate(tuple_list):
                 if flag_num ==  num:
-                    #不考虑列表最后一个
                     if (num != len(tuple_list) - 1) and (t == tuple_list[num + 1]):
                         sametuple_list = []
                         for numtwo in range(num ,len(tuple_list)):
                             if tuple_list[numtwo] == t and (numtwo != len(tuple_list) - 1):
                                 sametuple_list.append(clusterlist[numtwo])
-                            #考虑最后一个是多元组情况
                             elif tuple_list[numtwo] == t and (numtwo == len(tuple_list) - 1):
                                 sametuple_list.append(clusterlist[numtwo])
                                 new_clusterlist.append(sametuple_list)
@@ -586,20 +534,17 @@ for k,datalist in enumerate(testcasedes_list):
                     else:
                         new_clusterlist.append(clusterlist[num])
                         flag_num += 1
-            #将多元组包含单个元组情况的冗余解决
             for cluster in new_clusterlist:
                 if type(cluster) == list:
                     for num,each in enumerate(new_clusterlist):
                         if type(each) == int and (each in cluster):
                             redundancy_list[num] = 1
-            #将多元组包含多个元组情况的冗余解决
             for index,cluster in enumerate(new_clusterlist):
                 if type(cluster) == list and (redundancy_list[index] == 0):
                     for indextwo in range(index + 1,len(new_clusterlist)):
                         if type(new_clusterlist[indextwo]) == list :
                             if (set(new_clusterlist[indextwo]) == set(cluster)) or set(new_clusterlist[indextwo]).issubset(set(cluster)):
                                 redundancy_list[indextwo] = 1
-            #将单元组包含单元组情况的冗余解决
             for index,cluster in enumerate(new_clusterlist):
                 if type(cluster) == int and (redundancy_list[index] == 0):
                     for indextwo in range(index + 1,len(new_clusterlist)):
@@ -610,7 +555,6 @@ for k,datalist in enumerate(testcasedes_list):
 
    
 
-        #计算指标
         for num,each in enumerate(testrelation_list[k]):
             if each == 0 and redundancy_list[num] == 0:
                 unredundancy_TP += 1
@@ -626,7 +570,6 @@ for k,datalist in enumerate(testcasedes_list):
            
 
 
-        #日志
         with open(log_path, "a",encoding="utf-8") as fout:
             fout.write("********************************\n")
             fout.write("groudtruth:\n")
